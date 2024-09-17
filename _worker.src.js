@@ -9,20 +9,28 @@ let socks5Address = '';
 
 let addresses = [
 	//当sub为空时启用本地优选域名/优选IP，若不带端口号 TLS默认端口为443，#号后为备注别名
-	'12315.cf.090227.xyz:443#加入我的频道t.me/CMLiussss解锁更多优选节点',
-	'visa.cn#你可以只放域名 如下',
-	'www.visa.com.sg',
-	'time.is#也可以放域名带端口 如下',
+	/*
+	'Join.my.Telegram.channel.CMLiussss.to.unlock.more.premium.nodes.cf.090227.xyz#加入我的频道t.me/CMLiussss解锁更多优选节点',
+	'visa.cn:443',
+	'www.visa.com:8443',
+	'cis.visa.com:2053',
+	'africa.visa.com:2083',
+	'www.visa.com.sg:2087',
+	'www.visaeurope.at:2096',
+	'www.visa.com.mt:8443',
+	'qa.visamiddleeast.com',
+	'time.is',
 	'www.wto.org:8443',
-	'chatgpt.com:2087#节点名放在井号之后即可',
-	'icook.hk#若不带端口号默认端口为443',
-	'104.17.152.41#IP也可以',
-	'[2606:4700:e7:25:4b9:f8f8:9bfb:774a]#IPv6也OK'
+	'chatgpt.com:2087',
+	'icook.hk',
+	'104.17.0.0#IPv4',
+	'[2606:4700::]#IPv6'
+	*/
 ];
 
 let sub = ''; 
 let subconverter = 'SUBAPI.fxxk.dedyn.io';// clash订阅转换后端，目前使用CM的订阅转换功能。自带虚假节点信息防泄露
-let subconfig = "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini.ini"; //订阅配置文件
+let subconfig = "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Mini_MultiMode.ini"; //订阅配置文件
 let subProtocol = 'https';
 let RproxyIP = 'false';
 
@@ -35,14 +43,14 @@ let BotToken ='';
 let ChatID =''; 
 let proxyhosts = [];//本地代理域名池
 let proxyhostsURL = 'https://raw.githubusercontent.com/cmliu/CFcdnVmess2sub/main/proxyhosts';//在线代理域名池URL
+let go2Socks5s = [
+	'*ttvnw.net',
+];
 
 let fakeUserID ;
 let fakeHostName ;
 let proxyIPs ;
 let socks5s;
-let go2Socks5s = [
-	'*ttvnw.net',
-];
 let sha224Password ;
 const expire = 4102329600;//2099-12-31
 const regex = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\[.*\]):?(\d+)?#?(.*)?$/;
@@ -573,6 +581,28 @@ async function ADD(envadd) {
 	return add ;
 }
 
+function checkSUB(host) {
+	if ((!sub || sub == '') && (addresses.length + addressesapi.length + addressescsv.length) == 0){
+		addresses = [
+			'Join.my.Telegram.channel.CMLiussss.to.unlock.more.premium.nodes.cf.090227.xyz#加入我的频道t.me/CMLiussss解锁更多优选节点',
+			'visa.cn:443',
+			'www.visa.com:8443',
+			'cis.visa.com:2053',
+			'africa.visa.com:2083',
+			'www.visa.com.sg:2087',
+			'www.visaeurope.at:2096',
+			'www.visa.com.mt:8443',
+			'qa.visamiddleeast.com',
+			'time.is',
+			'www.wto.org:8443',
+			'chatgpt.com:2087',
+			'icook.hk',
+			//'104.17.0.0#IPv4',
+			'[2606:4700::]#IPv6'
+		];
+	}
+}
+
 function 配置信息(密码, 域名地址) {
 	const 啥啥啥_写的这是啥啊 = 'dHJvamFu';
 	const 协议类型 = atob(啥啥啥_写的这是啥啊);
@@ -597,6 +627,7 @@ function 配置信息(密码, 域名地址) {
 
 let subParams = ['sub','base64','b64','clash','singbox','sb','surge'];
 async function getTrojanConfig(password, hostName, sub, UA, RproxyIP, _url) {
+	checkSUB(hostName);
 	const userAgent = UA.toLowerCase();
 	const Config = 配置信息(password , hostName);
 	const v2ray = Config[0];
@@ -824,7 +855,7 @@ function subAddresses(host,pw,userAgent,newAddressesapi,newAddressescsv) {
 	const uniqueAddresses = [...new Set(addresses)];
 				
 	const responseBody = uniqueAddresses.map(address => {
-		let port = "443";
+		let port = "-1";
 		let addressid = address;
 
 		const match = addressid.match(regex);
@@ -855,7 +886,7 @@ function subAddresses(host,pw,userAgent,newAddressesapi,newAddressescsv) {
 		}
 
 		const httpsPorts = ["2053","2083","2087","2096","8443"];
-		if (!isValidIPv4(address) && port == "443") {
+		if (!isValidIPv4(address) && port == "-1") {
 			for (let httpsPort of httpsPorts) {
 				if (address.includes(httpsPort)) {
 					port = httpsPort;
@@ -863,6 +894,7 @@ function subAddresses(host,pw,userAgent,newAddressesapi,newAddressescsv) {
 				}
 			}
 		}
+		if (port == "-1") port = "443";
 		
 		let 伪装域名 = host ;
 		let 最终路径 = '/?ed=2560' ;
